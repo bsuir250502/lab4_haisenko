@@ -10,7 +10,7 @@ typedef struct tree_t {
     struct tree_t *right;
 } tree_t;
 
-void addValue(tree_t *root);
+void addValue(tree_t **root);
 void insertion(tree_t *root, int inputValue);
 void nodesOnLevel(tree_t *root);
 int findNumOfNodes(tree_t *node, int level);
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     checkHelpKey(argc, argv);
     char command[stringSize];
     tree_t *root;
-    root = (tree_t *) calloc(1, sizeof(tree_t));
+    root = 0;
     while (1) {
         printf("\nEnter command:\n");
         printf("    1 - Add value\n");
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
         fgets(command, stringSize, stdin);
         switch (command[0]) {
         case '1':
-            addValue(root);
+            addValue(&root);
             break;
         case '2':
             nodesOnLevel(root);
@@ -52,17 +52,16 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void addValue(tree_t *root)
+void addValue(tree_t **root)
 {
     int inputValue;
-    static int isFirstValue = 1;
     printf("Enter the value of the new node: ");
     inputValue = inputNumericalData();
-    if (isFirstValue) {
-        root->value = inputValue;
-        isFirstValue = 0;
+    if (!(*root)) {
+        *root = (tree_t *) calloc(1, sizeof(tree_t));
+        (*root)->value = inputValue;
     } else {
-        insertion(root, inputValue);
+        insertion(*root, inputValue);
     }
 }
 
@@ -94,6 +93,10 @@ void insertion(tree_t *node, int inputValue)
 
 void nodesOnLevel(tree_t *root)
 {
+    if (!root) {
+        printf("There is no values is the tree.\n");
+        return;
+    }
     int level, numOfNodes;
     printf("Enter level: \n");
     level = inputNumericalData();
@@ -116,9 +119,7 @@ int findNumOfNodes(tree_t *node, int level)
     int numOfNodes = 0;
     currLevel++;
     if (currLevel == level) {
-        if (node->value) {
-            numOfNodes++;
-        }
+        numOfNodes++;
         currLevel--;
         return numOfNodes;
     }
@@ -134,6 +135,10 @@ int findNumOfNodes(tree_t *node, int level)
 
 void printTree(tree_t *node)
 {
+    if (!node) {
+        printf("There is no values is the tree.\n");
+        return;
+    }
     static int level = 0;
     int i;
     level++;
@@ -169,12 +174,11 @@ int inputNumericalData()
 
 void freeTree(tree_t *node)
 {
-    if (node->left) {
-        freeTree(node->left);
+    if (!node) {
+        return;
     }
-    if (node->right ) {
-        freeTree(node->right);
-    }
+    freeTree(node->left);
+    freeTree(node->right);
     free(node);
 }
 
