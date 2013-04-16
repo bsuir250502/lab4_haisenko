@@ -55,17 +55,19 @@ int main(int argc, char *argv[])
 void addValue(tree_t *root)
 {
     int inputValue;
+    static int isFirstValue = 1;
     printf("Enter the value of the new node: ");
     inputValue = inputNumericalData();
-    insertion(root, inputValue);
+    if (isFirstValue) {
+        root->value = inputValue;
+        isFirstValue = 0;
+    } else {
+        insertion(root, inputValue);
+    }
 }
 
 void insertion(tree_t *node, int inputValue)
 {
-    if (!(node->value)) {
-        node->value = inputValue;
-        return;
-    }
     if (inputValue < node->value) {
         if (node->right) {
             insertion(node->right, inputValue);
@@ -93,7 +95,7 @@ void insertion(tree_t *node, int inputValue)
 void nodesOnLevel(tree_t *root)
 {
     int level, numOfNodes;
-    printf("\nEnter level: \n");
+    printf("Enter level: \n");
     level = inputNumericalData();
     if (level < 1) {
         printf("Wrong level.\n");
@@ -113,7 +115,6 @@ int findNumOfNodes(tree_t *node, int level)
     static int currLevel = 0;
     int numOfNodes = 0;
     currLevel++;
-    printf("%d\n", currLevel);
     if (currLevel == level) {
         if (node->value) {
             numOfNodes++;
@@ -151,12 +152,16 @@ void printTree(tree_t *node)
 
 int inputNumericalData()
 {
-    char buffer[stringSize];
+    char buffer[stringSize], *bufferPointer;
     int num;
+    bufferPointer = buffer;
     do {
         fgets(buffer, stringSize, stdin);
-        num = atoi(buffer);
+        num = strtol(buffer, &bufferPointer, 10);
         if (num == 0) {
+            if (*(--bufferPointer) == '0') {
+                break;
+            }
             printf("Incorrect value. Try again: ");
             continue;
         }
