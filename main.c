@@ -158,10 +158,7 @@ int inputNumericalData()
     do {
         fgets(buffer, stringSize, stdin);
         num = strtol(buffer, &bufferPointer, 10);
-        if (num == 0) {
-            if (*(--bufferPointer) == '0') {
-                break;
-            }
+        if (*bufferPointer != '\n') {
             printf("Incorrect value. Try again: ");
             continue;
         }
